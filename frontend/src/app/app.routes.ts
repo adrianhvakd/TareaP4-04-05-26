@@ -10,14 +10,24 @@ import { DashboardUserComponent } from './features/user/dashboard/dashboard.user
 import { EmpresasUserComponent } from './features/user/empresas/empresas.user';
 import { TramitesUserComponent } from './features/user/tramites/tramites.user';
 import { PagosUserComponent } from './features/user/pagos/pagos.user';
+import { adminGuard, userGuard } from './core/guards/auth.guard';
+import { publicGuard } from './core/guards/public.guard';
+
 
 export const routes: Routes = [
   {
     path: 'auth/login',
     component: LoginComponent,
+    canActivate: [publicGuard],
+  },
+  {
+    path: '',
+    pathMatch: 'full',
+    redirectTo: 'admin'
   },
   {
     path: 'admin',
+    canActivate: [adminGuard],
     component: LayoutAdminComponent,
     children: [
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
@@ -41,6 +51,7 @@ export const routes: Routes = [
   },
   {
     path: 'user',
+    canActivate: [userGuard],
     component: LayoutUserComponent,
     children: [
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' },

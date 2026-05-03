@@ -1,1 +1,135 @@
-<h1 class="text-6xl text-primary"> pagos user </h1>
+<div class="p-6">
+  <div class="flex justify-between items-center mb-6">
+    <div>
+      <h1 class="text-2xl font-bold">Gestión de Pagos</h1>
+      <p class="text-sm opacity-70">Registra y valida los pagos de trámites</p>
+    </div>
+    <div class="flex gap-2">
+      <div class="stats bg-primary text-primary-content">
+        <div class="stat">
+          <div class="stat-title">Total Registrado</div>
+          <div class="stat-value">Bs. {{ getTotalMonto() | number:'1.2-2' }}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <button class="btn btn-primary mb-4" (click)="openCreateModal()">
+    <span class="material-symbols-outlined">add</span>
+    Registrar Pago
+  </button>
+
+  @if(loading()) {
+    <div class="flex justify-center p-8">
+      <span class="loading loading-spinner loading-lg"></span>
+    </div>
+  } @else {
+    <div class="overflow-x-auto">
+      <table class="table table-zebra">
+        <thead>
+          <tr>
+            <th>Trámite</th>
+            <th>Monto Pagado</th>
+            <th>Método</th>
+            <th>Comprobante</th>
+            <th>Fecha</th>
+            <th class="text-right">Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (pago of pagos(); track pago.id) {
+            <tr>
+              <td class="font-medium">{{ pago.tramite?.empresa?.nombre || 'Sin trámite' }}</td>
+              <td class="font-bold text-success">Bs. {{ pago.montoPagado | number:'1.2-2' }}</td>
+              <td>
+                <span [class]="'badge ' + getMetodoColor(pago.metodoPago)">
+                  {{ pago.metodoPago }}
+                </span>
+              </td>
+              <td>
+                @if(pago.comprobante) {
+                  <span class="text-sm opacity-70">{{ pago.comprobante }}</span>
+                } @else {
+                  <span class="text-xs">Sin comprobante</span>
+                }
+              </td>
+              <td>{{ pago.fechaPago | date:'dd/MM/yyyy HH:mm' }}</td>
+              <td class="text-right">
+                <button class="btn btn-sm btn-ghost" (click)="deletePago(pago)">
+                  <span class="material-symbols-outlined text-error">delete</span>
+                </button>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+    @if(total() > 10) {
+      <div class="flex justify-center gap-2 mt-4">
+        <button class="btn btn-sm" [disabled]="currentPage() === 1" (click)="prevPage()">
+          Anterior
+        </button>
+        <span class="btn btn-sm btn-disabled">Página {{ currentPage() }} de {{ totalPages() }}</span>
+        <button class="btn btn-sm" [disabled]="currentPage() === totalPages()" (click)="nextPage()">
+          Siguiente
+        </button>
+      </div>
+    }
+  }
+
+  @if(showModal()) {
+    <div class="modal modal-open">
+      <div class="modal-box">
+        <h3 class="font-bold text-lg">Registrar Pago</h3>
+        
+        <div class="form-control mt-4">
+          <label class="label">
+            <span class="label-text">Trámite</span>
+          </label>
+          <select class="select select-bordered" [(ngModel)]="formData.tramiteId">
+            <option value="">Seleccionar trámite</option>
+            @for (tramite of tramitesParaPagar(); track tramite.id) {
+              <option [value]="tramite.id">
+                {{ tramite.empresa?.nombre }} - Bs. {{ tramite.monto }} ({{ tramite.estado }})
+              </option>
+            }
+          </select>
+        </div>
+
+        <div class="form-control mt-2">
+          <label class="label">
+            <span class="label-text">Monto Pagado (Bs.)</span>
+          </label>
+          <input type="number" class="input input-bordered" [(ngModel)]="formData.montoPagado" />
+        </div>
+
+        <div class="form-control mt-2">
+          <label class="label">
+            <span class="label-text">Método de Pago</span>
+          </label>
+          <select class="select select-bordered" [(ngModel)]="formData.metodoPago">
+            @for (metodo of metodos; track metodo) {
+              <option [value]="metodo">{{ metodo }}</option>
+            }
+          </select>
+        </div>
+
+        <div class="form-control mt-2">
+          <label class="label">
+            <span class="label-text">Comprobante (opcional)</span>
+          </label>
+          <input type="text" class="input input-bordered" [(ngModel)]="formData.comprobante" placeholder="Número de transacción" />
+        </div>
+
+        <div class="modal-action">
+          <button class="btn btn-ghost" (click)="closeModal()">Cancelar</button>
+          <button class="btn btn-primary" (click)="savePago()" [disabled]="loading() || !formData.tramiteId">
+            Registrar
+          </button>
+        </div>
+      </div>
+      <div class="modal-backdrop" (click)="closeModal()"></div>
+    </div>
+  }
+</div>

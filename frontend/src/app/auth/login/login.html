@@ -1,13 +1,58 @@
-<div class="h-full flex justify-center items-center">
-  <fieldset class="fieldset bg-base-200 border-base-300 rounded-box w-xs border p-4">
-    <legend class="fieldset-legend">Login</legend>
+<div class="h-screen flex justify-center items-center bg-base-100">
+  <form #loginForm="ngForm" (ngSubmit)="onSubmit()" 
+        class="fieldset bg-base-200 border-base-300 rounded-box w-full max-w-xs border p-6 shadow-xl">
+    
+    <legend class="fieldset-legend text-xl font-bold mb-4">SGTE - Acceso</legend>
 
-    <label class="label">Email</label>
-    <input type="email" class="input" placeholder="Email" />
+    <div class="form-control">
+      <label class="label">
+        <span class="label-text font-semibold">Usuario</span>
+      </label>
+      <input 
+        [(ngModel)]="username" 
+        type="text" 
+        name="username"
+        class="input input-bordered focus:input-primary" 
+        placeholder="Nombre de usuario" 
+        required 
+      />
+    </div>
 
-    <label class="label">Password</label>
-    <input type="password" class="input" placeholder="Password" />
+    <div class="form-control mt-2">
+      <label class="label">
+        <span class="label-text font-semibold">Contraseña</span>
+      </label>
+      <input
+        [(ngModel)]="password"
+        type="password"
+        name="password"
+        class="input input-bordered focus:input-primary"
+        placeholder="••••••••"
+        required
+      />
+    </div>
 
-    <button class="btn btn-neutral mt-4">Login</button>
-  </fieldset>
+    @if(error()){
+      <div role="alert" class="alert alert-error mt-6 text-sm py-2">
+        <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+        <span>{{ error() }}</span>
+      </div>
+    }
+
+    <button 
+      type="submit" 
+      [disabled]="loading() || !username || !password" 
+      class="btn btn-primary mt-6 w-full uppercase tracking-widest">
+      @if (loading()) {
+        <span class="loading loading-spinner"></span>
+        Validando...
+      } @else {
+        Ingresar
+      }
+    </button>
+
+    <div class="divider text-xs text-base-content/40">Potosí, Bolivia</div>
+  </form>
 </div>

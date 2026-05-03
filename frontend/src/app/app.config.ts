@@ -1,12 +1,25 @@
-import { ApplicationConfig, provideBrowserGlobalErrorListeners } from '@angular/core';
-import { provideRouter } from '@angular/router';
-
+import { ApplicationConfig, APP_INITIALIZER } from '@angular/core';
+import { provideRouter, withViewTransitions } from '@angular/router';
+import { provideHttpClient, withFetch } from '@angular/common/http';
+import { provideCharts, withDefaultRegisterables } from 'ng2-charts';
 import { routes } from './app.routes';
-import { provideClientHydration, withEventReplay } from '@angular/platform-browser';
+import { AuthService } from './auth/auth.service';
+import { firstValueFrom } from 'rxjs';
+
+export function initializeApp(authService: AuthService): () => Promise<boolean> {
+  return () => firstValueFrom(authService.initializeAndGetAuthStatus());
+}
 
 export const appConfig: ApplicationConfig = {
   providers: [
-    provideBrowserGlobalErrorListeners(),
-    provideRouter(routes), provideClientHydration(withEventReplay())
+    provideRouter(routes, withViewTransitions()),
+    provideHttpClient(withFetch()),
+    provideCharts(withDefaultRegisterables()),
+    {
+      provide: APP_INITIALIZER,
+      useFactory: initializeApp,
+      deps: [AuthService],
+      multi: true
+    }
   ]
 };

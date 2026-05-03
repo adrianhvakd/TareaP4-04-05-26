@@ -1,1 +1,73 @@
-<h1 class="text-6xl text-primary"> tramites admin </h1>
+<div class="p-6">
+  <div class="flex justify-between items-center mb-6">
+    <h1 class="text-2xl font-bold">Supervisión de Trámites</h1>
+    <div class="stats shadow">
+      <div class="stat">
+        <div class="stat-title">Total</div>
+        <div class="stat-value text-primary">{{ total() }}</div>
+      </div>
+      <div class="stat">
+        <div class="stat-title">Monto Total</div>
+        <div class="stat-value text-secondary">Bs. {{ getMontoTotal() | number:'1.2-2' }}</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-2 mb-6">
+    @for (estado of estados; track estado) {
+      <div class="stat bg-base-200 rounded-lg p-2">
+        <div class="text-xs opacity-70">{{ estado }}</div>
+        <div class="text-xl font-bold">{{ getCountByEstado(estado) }}</div>
+      </div>
+    }
+  </div>
+
+  @if(loading()) {
+    <div class="flex justify-center p-8">
+      <span class="loading loading-spinner loading-lg"></span>
+    </div>
+  } @else {
+    <div class="overflow-x-auto">
+      <table class="table table-zebra">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Empresa</th>
+            <th>Estado</th>
+            <th>Monto</th>
+            <th>Fecha Creación</th>
+            <th>Última Actualización</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (tramite of tramites(); track tramite.id) {
+            <tr>
+              <td class="text-xs font-mono">{{ tramite.id.slice(0,8) }}...</td>
+              <td class="font-medium">{{ tramite.empresa?.nombre || 'Sin empresa' }}</td>
+              <td>
+                <span [class]="'badge ' + getEstadoColor(tramite.estado)">
+                  {{ tramite.estado }}
+                </span>
+              </td>
+              <td class="font-bold">Bs. {{ tramite.monto | number:'1.2-2' }}</td>
+              <td>{{ tramite.fechaCreacion | date:'dd/MM/yyyy HH:mm' }}</td>
+              <td>{{ tramite.updatedAt | date:'dd/MM/yyyy HH:mm' }}</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+    @if(total() > 10) {
+      <div class="flex justify-center gap-2 mt-4">
+        <button class="btn btn-sm" [disabled]="currentPage() === 1" (click)="prevPage()">
+          Anterior
+        </button>
+        <span class="btn btn-sm btn-disabled">Página {{ currentPage() }} de {{ totalPages() }}</span>
+        <button class="btn btn-sm" [disabled]="currentPage() === totalPages()" (click)="nextPage()">
+          Siguiente
+        </button>
+      </div>
+    }
+  }
+</div>

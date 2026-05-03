@@ -1,1 +1,95 @@
-<h1 class="text-6xl text-primary"> empresas admin </h1>
+<div class="p-6">
+  <div class="flex justify-between items-center mb-6">
+    <h1 class="text-2xl font-bold">Empresas Registradas</h1>
+    <span class="badge badge-info">{{ total() }} empresas</span>
+  </div>
+
+  <div class="flex gap-4 mb-6">
+    <input 
+      type="text" 
+      placeholder="Buscar empresa..." 
+      class="input input-bordered w-full max-w-xs"
+      [ngModel]="searchTerm()"
+      (ngModelChange)="searchTerm.set($event)"
+      (keyup.enter)="search()"
+    />
+    <button class="btn btn-secondary" (click)="search()">
+      <span class="material-symbols-outlined">search</span>
+    </button>
+  </div>
+
+  @if(loading()) {
+    <div class="flex justify-center p-8">
+      <span class="loading loading-spinner loading-lg"></span>
+    </div>
+  } @else {
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+      @for (empresa of empresas(); track empresa.id) {
+        <div class="card bg-base-200 shadow-xl cursor-pointer hover:scale-105 transition-transform" (click)="openDetail(empresa)">
+          <div class="card-body">
+            <div class="flex items-center gap-2 mb-2">
+              <span class="material-symbols-outlined text-primary">business</span>
+              <span class="badge badge-primary badge-outline">Auditoría</span>
+            </div>
+            <h2 class="card-title text-lg">{{ empresa.nombre }}</h2>
+            <p class="text-sm text-base-content/70">
+              <span class="material-symbols-outlined text-sm">location_on</span>
+              {{ empresa.direccion }}
+            </p>
+            <p class="text-sm text-base-content/70">
+              <span class="material-symbols-outlined text-sm">phone</span>
+              {{ empresa.telefono }}
+            </p>
+            <div class="text-xs text-base-content/50 mt-2">
+              Creado: {{ empresa.createdAt | date:'dd/MM/yyyy' }}
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+
+    @if(total() > 12) {
+      <div class="flex justify-center gap-2 mt-8">
+        <button class="btn btn-sm" [disabled]="currentPage() === 1" (click)="prevPage()">
+          Anterior
+        </button>
+        <span class="btn btn-sm btn-disabled">Página {{ currentPage() }} de {{ totalPages() }}</span>
+        <button class="btn btn-sm" [disabled]="currentPage() === totalPages()" (click)="nextPage()">
+          Siguiente
+        </button>
+      </div>
+    }
+  }
+
+  @if(selectedEmpresa()) {
+    <div class="modal modal-open">
+      <div class="modal-box">
+        <h3 class="font-bold text-xl flex items-center gap-2">
+          <span class="material-symbols-outlined text-primary">business</span>
+          {{ selectedEmpresa()!.nombre }}
+        </h3>
+        
+        <div class="mt-4 space-y-3">
+          <div class="flex items-center gap-2">
+            <span class="material-symbols-outlined">location_on</span>
+            <span>{{ selectedEmpresa()!.direccion }}</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="material-symbols-outlined">phone</span>
+            <span>{{ selectedEmpresa()!.telefono }}</span>
+          </div>
+          <div class="divider"></div>
+          <div class="text-sm text-base-content/70">
+            <p>Creado: {{ selectedEmpresa()!.createdAt | date:'dd/MM/yyyy HH:mm' }}</p>
+            <p>Actualizado: {{ selectedEmpresa()!.updatedAt | date:'dd/MM/yyyy HH:mm' }}</p>
+          </div>
+        </div>
+
+        <div class="modal-action">
+          <button class="btn btn-primary" (click)="closeDetail()">Cerrar</button>
+        </div>
+      </div>
+      <div class="modal-backdrop" (click)="closeDetail()"></div>
+    </div>
+  }
+</div>

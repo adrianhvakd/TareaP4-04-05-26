@@ -1,6 +1,23 @@
-import { Body, Controller, Post, Res } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Post,
+  Req,
+  Res,
+  UseGuards,
+} from '@nestjs/common';
 import { AuthService } from './auth.service';
 import type { Response } from 'express';
+import { JwtAuthGuard } from './guards/jwt-auth.guard';
+
+interface RequestWithUser extends Request {
+  user: {
+    id: string;
+    username: string;
+    role: string;
+  };
+}
 
 @Controller('auth')
 export class AuthController {
@@ -24,6 +41,7 @@ export class AuthController {
       message: 'Login exitoso',
       user: {
         username: datos.username,
+        role: result.role,
       },
     };
   }
@@ -32,5 +50,16 @@ export class AuthController {
   logout(@Res({ passthrough: true }) response: Response) {
     response.clearCookie('jwt_token');
     return { message: 'Sesión cerrada' };
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('check')
+  checkAuth(@Req() req: RequestWithUser) {
+    return {
+      user: {
+        username: req.user.username,
+        role: req.user.role,
+      },
+    };
   }
 }

@@ -28,6 +28,9 @@ export class TramiteEntity {
   @PrimaryGeneratedColumn('uuid')
   id: string = v4();
 
+  @Column({ name: 'usuario_id', type: 'uuid', nullable: true })
+  usuarioId?: string;
+
   @Column({ name: 'empresa_id', type: 'uuid', nullable: true })
   empresaId?: string;
 

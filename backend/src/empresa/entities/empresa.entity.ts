@@ -15,6 +15,9 @@ export class EmpresaEntity {
   @PrimaryGeneratedColumn('uuid')
   id: string = v4();
 
+  @Column({ name: 'usuario_id', type: 'uuid', nullable: true })
+  usuarioId?: string;
+
   @Column()
   nombre?: string;
 

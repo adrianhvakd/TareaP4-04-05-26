@@ -1,1 +1,116 @@
-<h1 class="text-6xl text-primary"> dashboard admin </h1>
+<div class="p-6">
+    <h1 class="text-3xl font-bold mb-6">Dashboard Administrador</h1>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+        <div class="stats shadow">
+            <div class="stat">
+                <div class="stat-title">Total Trámites</div>
+                <div class="stat-value text-primary">{{ totalTramites() }}</div>
+            </div>
+        </div>
+        <div class="stats shadow">
+            <div class="stat">
+                <div class="stat-title">Total Empresas</div>
+                <div class="stat-value text-secondary">{{ totalEmpresas() }}</div>
+            </div>
+        </div>
+        <div class="stats shadow">
+            <div class="stat">
+                <div class="stat-title">Monto Total</div>
+                <div class="stat-value">Bs. {{ montoTotal() | number:'1.2-2' }}</div>
+            </div>
+        </div>
+        <div class="stats shadow">
+            <div class="stat">
+                <div class="stat-title">Cobrado</div>
+                <div class="stat-value text-success">Bs. {{ montoCobrado() | number:'1.2-2' }}</div>
+            </div>
+        </div>
+    </div>
+
+    @if(loading()) {
+        <div class="flex justify-center p-8">
+            <span class="loading loading-spinner loading-lg"></span>
+        </div>
+    } @else {
+        <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
+            <div class="card bg-base-200 shadow-xl">
+                <div class="card-body p-4">
+                    <h2 class="card-title text-sm">Trámites por Estado</h2>
+                    <div class="h-40">
+                        <canvas baseChart
+                            [data]="{
+                                labels: doughnutChartLabels,
+                                datasets: [{ data: doughnutChartData, backgroundColor: getChartColors() }]
+                            }"
+                            [type]="doughnutChartType"
+                            [options]="{ responsive: true, maintainAspectRatio: false }">
+                        </canvas>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card bg-base-200 shadow-xl">
+                <div class="card-body p-4">
+                    <h2 class="card-title text-sm">Montos por Mes</h2>
+                    <div class="h-40">
+                        <canvas baseChart
+                            [data]="{
+                                labels: barChartLabels,
+                                datasets: [{ data: barChartData, label: 'Monto (Bs.)', backgroundColor: '#3b82f6' }]
+                            }"
+                            [type]="barChartType"
+                            [options]="{ responsive: true, maintainAspectRatio: false }">
+                        </canvas>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card bg-base-200 shadow-xl">
+                <div class="card-body p-4">
+                    <h2 class="card-title text-sm">Estado de Cobranza</h2>
+                    <div class="h-40">
+                        <canvas baseChart
+                            [data]="{
+                                labels: ['Pendiente', 'Cobrado'],
+                                datasets: [{ data: pagosDoughnutData, backgroundColor: ['#ef4444', '#22c55e'] }]
+                            }"
+                            [type]="'doughnut'"
+                            [options]="{ responsive: true, maintainAspectRatio: false }">
+                        </canvas>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card bg-base-200 shadow-xl">
+                <div class="card-body p-4">
+                    <h2 class="card-title text-sm">Resumen de Trámites</h2>
+                    <div class="overflow-y-auto h-40">
+                        <table class="table table-zebra table-xs">
+                            <thead>
+                                <tr>
+                                    <th class="text-xs">Estado</th>
+                                    <th class="text-right text-xs">Cant.</th>
+                                    <th class="text-right text-xs">%</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @for (label of doughnutChartLabels; track label; let i = $index) {
+                                    <tr>
+                                        <td>
+                                            <span class="badge badge-xs" [style.background-color]="getEstadoColor(label)">
+                                                {{ label }}
+                                            </span>
+                                        </td>
+                                        <td class="text-right text-xs">{{ doughnutChartData[i] }}</td>
+                                        <td class="text-right text-xs">{{ (doughnutChartData[i] / totalTramites() * 100) | number:'1.1-1' }}%</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>

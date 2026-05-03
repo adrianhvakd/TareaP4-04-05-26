@@ -29,6 +29,7 @@ export class AuthService {
     return {
       access_token: token,
       type: 'bearer',
+      role: usuario.role,
     };
   }
 }

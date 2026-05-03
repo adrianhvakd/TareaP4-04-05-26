@@ -1,5 +1,6 @@
-import { Component } from "@angular/core";
+import { Component, inject } from "@angular/core";
 import { RouterLink, RouterOutlet } from "@angular/router";
+import { AuthService } from "../../../auth/auth.service";
 
 @Component({
     selector: 'app-layout-admin',
@@ -8,6 +9,8 @@ import { RouterLink, RouterOutlet } from "@angular/router";
     imports: [RouterOutlet, RouterLink]
 })
 export class LayoutAdminComponent {
+    private authService = inject(AuthService);
+    
     menuNav = [
         {
             name: 'Dashboard',
@@ -29,5 +32,9 @@ export class LayoutAdminComponent {
             route: 'tramites',
             icon: 'folder_copy'
         }
-    ]
+    ];
+
+    logout() {
+        this.authService.logout().subscribe();
+    }
 }
