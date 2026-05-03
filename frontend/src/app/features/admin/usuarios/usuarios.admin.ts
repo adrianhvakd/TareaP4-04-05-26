@@ -1,7 +1,7 @@
 import { Component, inject, OnInit, signal } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { FormsModule } from "@angular/forms";
-import { UsuariosService, Usuario } from "./usuarios.service";
+import { Usuario, UsuariosService } from "../../services/usuarios.service";
 
 @Component({
     selector: 'app-usuarios',
